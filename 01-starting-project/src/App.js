@@ -7,11 +7,16 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [counter, setCounter] = useState (0);
+  
+   const callSetCounter = () => {
+    setCounter(counter + 1);
+  }
+  
+  
   const fetchMoviesHandler = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
       const response = await fetch(
         "https://react-course-http-41d19-default-rtdb.firebaseio.com/movies.json"
@@ -20,9 +25,9 @@ function App() {
       // Fetch API no real error, Axios real error
       // We have to chek the response before we try to parse the reponse
       // Because json data sometimes fails
-      // Question: I don't understand Error
+      
       if (!response.ok) {
-        throw new Error("Error number: XXX");
+        throw new Error("Error XXX");
       }
 
       const data = await response.json();
@@ -64,11 +69,12 @@ function App() {
     const response = await fetch(
       "https://react-course-http-41d19-default-rtdb.firebaseio.com/movies.json",
       {
+        //Métodos: POST, PUT, PATCH, DELETE, ETC.
         method: "POST",
         body: JSON.stringify(movie),
+        //Tipo de dato: Content-Type
         headers: {
-          // Question: What is this?
-          "Content-Type": "application/json",
+          "Content-Type" : "application/json",
         },
       }
     );
@@ -79,12 +85,15 @@ function App() {
   let content = <p></p>;
 
   console.log(movies.length);
-
-  if (movies.length === 0) {
+  console.log(counter);
+  
+  if (movies.length === 0 && counter === 0) {
+    content = <p>Click on the button to search movies</p>;
+  } else if (movies.length === 0 && counter > 0) {
     content = <p>No movies</p>;
   } else if (movies.length > 0) {
     content = <MoviesList movies={movies} />;
-  }
+  } 
 
   if (isLoading) {
     content = <p>Loading ...</p>;
@@ -100,7 +109,11 @@ function App() {
         <AddMovie onAddMovie={addMovieHandler} />
       </section>
       <section>
-        <button id="searchButton" onClick={fetchMoviesHandler}>
+        {/* Call multiple functions onClick button */}
+        <button id="searchButton" onClick={() =>{
+          fetchMoviesHandler();
+          callSetCounter();
+        }}>
           {" "}
           Fetch movies{" "}
         </button>
